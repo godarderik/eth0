@@ -109,10 +109,13 @@ class MarketBot(Protocol):
         pass
 
     def on_rejection(self, data):
+        print("REJECTED!!")
+        print("\n" * 10)
         for x in self.open_orders:
             if x["order_id"] == data["order_id"]:
                 self.open_orders.remove(x)
                 break
+
     def on_order_filled(self, data):
         if self.flagged:
             self.flagged = False
