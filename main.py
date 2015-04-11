@@ -75,33 +75,37 @@ class MarketBot(Protocol):
         """
 
         """
+        pass
 
     def on_rejection(self, data):
         """
         Cry
         """
+        pass
 
-    def on_stuff(self, data):
+    def on_order_filled(self, data):
         """
 
         """
+        pass
 
-    def on_stuff(self, data):
+    def on_out(self, data):
         """
 
         """
-
-
+        pass
 
     def on_public_trade(self, data):
         """
         Handle a public trade on the market
         """
+        pass
 
     def on_book_status(self, data):
         """
         Handle more current information about the book
         """
+        pass
 
     def on_hello(self, data):
         """
