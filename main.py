@@ -214,19 +214,14 @@ class MarketBot(Protocol):
             buy += 1
             sell -= 1
         else:
-            print(207)
             return
 
         if (self.spread[symbol][0] > buy):
-            print(211)
             return 
 
         if (self.spread[symbol][1] < sell):
-            print(215)
             return 
 
-
-        print("PLACING ORDER")
         #place new orders
         order_amt = 1
 
