@@ -5,6 +5,7 @@ from twisted.python import log
 import json
 import pickle
 import csv
+import math
 
 # system imports
 import time, sys
@@ -62,7 +63,7 @@ class MarketBot(Protocol):
         self.last_cancel = time.time()
         self.cancel_time = 1
         self.canceling = False
-        self.file = open('data.p', 'w')
+        self.file = open('data.csv', 'w')
         self.csv = csv.writer(self.file)
         self.orders = {}
 
@@ -118,6 +119,9 @@ class MarketBot(Protocol):
         order = self.orders[data['order_id']]
         self.open_orders.append(order)
         # update the spread
+        if order['symbol'] == 'BAZ':
+            self.csv.writerow([order['price']])
+
         if order['dir'] == 'BUY':
             self.spread[order['symbol']][0] = order['price']
         elif order['dir'] == 'SELL':
@@ -173,6 +177,13 @@ class MarketBot(Protocol):
             cancel_msg = {"type": "cancel", "order_id": x["order_id"]}
             self.message(cancel_msg)
         self.open_orders = []
+        self.spread = {
+            'FOO': [-99999999999,99999999999],
+            'BAR': [-99999999999,99999999999],
+            'BAZ': [-99999999999,99999999999],
+            'QUUX': [-99999999999,99999999999],
+            'CORGE': [-99999999999,99999999999],
+        }
 
     def on_book_status(self, data):
         """
@@ -180,7 +191,7 @@ class MarketBot(Protocol):
         Make offers depending on the spread price of the book
         """
 
-        print(len(self.open_orders))
+        print("Open orders: {0}".format(len(self.open_orders)))
 
         if len(self.open_orders) == 0:
             self.canceling = False
@@ -204,28 +215,26 @@ class MarketBot(Protocol):
             buy += 1
             sell -= 1
         else:
-            print(207)
             return
 
         if (self.spread[symbol][0] > buy):
-            print(211)
             return 
 
         if (self.spread[symbol][1] < sell):
-            print(215)
             return 
 
-
-        print("PLACING ORDER")
         #place new orders
-        order_amt = 100
+        buy_order_amt = math.floor((sell-buy)/50*math.e**(-1*self.positions[symbol]/100))
 
-        buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
+        buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : buy_order_amt}
         self.message(buy_order)
         self.order_count += 1
 
+        sell_order_amt = 50 - sell_order_amt
+        if sell_order_amt < 0: 
+            sell_order_amt = 0
 
-        sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
+        sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : sell_order_amt}
         self.message(sell_order)
         self.order_count += 1   
 
