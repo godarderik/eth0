@@ -224,7 +224,7 @@ class MarketBot(Protocol):
             return 
 
         #place new orders
-        buy_order_amt = int(.1 * (sell - buy))
+        buy_order_amt = 50 - int(.1 * (sell - buy))
 
         buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : buy_order_amt}
         self.message(buy_order)
