@@ -2,10 +2,12 @@
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet import reactor, protocol
 from twisted.python import log
+from twisted.internet.defer import setDebugging
 import json
 import pickle
 import csv
 
+setDebugging(True)
 # system imports
 import time, sys
 
@@ -145,12 +147,12 @@ class MarketBot(Protocol):
     def on_order_filled(self, data):
         if self.flagged:
             self.flagged = False
-            print("ORDER FILLED : {0}".format(data['order_id']))
-            print self.cash
+            # print("ORDER FILLED : {0}".format(data['order_id']))
+            # print self.cash
             # for symbol, position in self.positions.items():
             #     print("SYM: {0} POS: {1}".format(symbol, position))
-            print(len(self.open_orders))
-            print(data)
+            # print(len(self.open_orders))
+            # print(data)
         for x in self.open_orders:
             if x["order_id"] == data["order_id"]:
                 self.open_orders.remove(x)
