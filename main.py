@@ -47,6 +47,8 @@ class MarketBot(Protocol):
         Do something with the data
         """
         if (self.flagged):
+            data = json.loads(data)
+
             print(data[:10])
             print(type(data))
             print(dir(data))
