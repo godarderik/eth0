@@ -221,13 +221,16 @@ class MarketBot(Protocol):
             buy += 1
             sell -= 1
         else:
+            print("not enough margin")
             return
 
         # make sure we don't shoot ourselves
         if (self.spread[symbol][0] > buy):
+            print("buying ourselves")
             return 
 
         if (self.spread[symbol][1] < sell):
+            print("selling ourselves")
             return 
 
         # should we buy at all? based on our position
@@ -236,12 +239,14 @@ class MarketBot(Protocol):
             # we only want to buy as long as the overall is small
             if (self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
                 # print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
+                print("position too high")
                 return
         
         if self.positions[symbol] < 0:
             # we only want to buy as long as the overall is small
             if (-1 * self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
                 # print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
+                print("position too high")
                 return
 
         #place new orders
