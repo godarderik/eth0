@@ -47,17 +47,18 @@ class MarketBot(Protocol):
         Do something with the data
         """
         if (self.flagged):
-            for datum in data.split('\n'):
-                a = json.loads(datum)
-                handle_single_message(a)
-
+            print(data)
             print(data[:10])
             print(type(data))
             print(dir(data))
             self.flagged = False
         return
     
-    def handle_single_message(data):
+        for datum in data.split('\n'):
+            a = json.loads(datum)
+            self.handle_single_message(a)
+
+    def handle_single_message(self, data):
         """
         handle a single message
         """
