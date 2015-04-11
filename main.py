@@ -110,7 +110,7 @@ class MarketBot(Protocol):
                 open_orders.remove(x)
                 break
     def on_order_filled(self, data):
-
+        print("ORDER FILLED : {0}".format(data['order_id']))
         print self.cash
         # for symbol, position in self.positions.items():
         #     print("SYM: {0} POS: {1}".format(symbol, position))
