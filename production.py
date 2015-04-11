@@ -169,11 +169,11 @@ class MarketBot(Protocol):
 
     def cancel_all(self):
         # for x in self.open_orders: 
-        print("calling cancel all")
-        print("\n"*10)
+        #print("calling cancel all")
+        #print("\n"*10)
         for x in self.open_orders:
-            print("canceling order: {0}".format(x['order_id']))
-            print("total orders: {0}".format(len(self.open_orders))) 
+            #print("canceling order: {0}".format(x['order_id']))
+            #print("total orders: {0}".format(len(self.open_orders))) 
             cancel_msg = {"type": "cancel", "order_id": x["order_id"]}
             self.message(cancel_msg)
         self.open_orders = []

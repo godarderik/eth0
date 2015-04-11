@@ -19,7 +19,7 @@ SLOW_MARKET = 0
 FAST_MARKET = 1
 EMPTY_MARKET = 2
 
-ALPHA_FACTOR = 0.1
+ALPHA_FACTOR = 1
 
 class MarketBot(Protocol):
     def __init__(self):
@@ -221,7 +221,7 @@ class MarketBot(Protocol):
             buy += 1
             sell -= 1
         else:
-            print("not enough margin")
+            print("not enough margin {0}".format(sell - buy))
             return
 
         # make sure we don't shoot ourselves
@@ -265,10 +265,11 @@ class MarketBot(Protocol):
         self.orders[sell_order['order_id']] = sell_order  
 
     def calculate_overall_position(self):
-        overall = self.cash
+	overall = self.cash
         for symbol, position in self.positions.items():
             overall += self.values[symbol] * position 
-        return overall
+        print(overall)
+	return overall
 
     def on_hello(self, data):
         """
