@@ -47,7 +47,7 @@ class MarketBot(Protocol):
         Do something with the data
         """
         if (self.flagged):
-            print(data)
+            print(data[:10])
             print(type(data))
             print(dir(data))
             self.flagged = False
@@ -67,7 +67,7 @@ class MarketBot(Protocol):
         elif data['type'] == 'fill':
             self.on_order_filled(data)
         elif data['type'] == 'out':
-            self.on_out(data) 
+            self.on_out(data)
 
         # boilerplate stuff
         elif data['type'] == 'hello':
