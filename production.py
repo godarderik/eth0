@@ -46,7 +46,14 @@ class MarketBot(Protocol):
             'QUUX': 0,
             'CORGE': 0,
         }
-        
+
+        self.spread = {
+            'FOO': [-99999999999,99999999999],
+            'BAR': [-99999999999,99999999999],
+            'BAZ': [-99999999999,99999999999],
+            'QUUX': [-99999999999,99999999999],
+            'CORGE': [-99999999999,99999999999],
+        }
         # not sure about the type for this yet
         self.order_history = []
         self.open_orders = []
@@ -56,8 +63,9 @@ class MarketBot(Protocol):
         self.last_cancel = time.time()
         self.cancel_time = 1
         self.canceling = False
-        self.file = open('data.p', 'w')
+        self.file = open('data.csv', 'w')
         self.csv = csv.writer(self.file)
+        self.orders = {}
 
     def connectionMade(self):
         # maybe do something here
@@ -108,15 +116,21 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        pass
+        order = self.orders[data['order_id']]
+        self.open_orders.append(order)
+        # update the spread
+        if order['symbol'] == 'BAZ':
+            self.csv.writerow([order['price']])
+
+        if order['dir'] == 'BUY':
+            self.spread[order['symbol']][0] = order['price']
+        elif order['dir'] == 'SELL':
+            self.spread[order['symbol']][1] = order['price']
 
     def on_rejection(self, data):
-        print("REJECTED!!")
+        print("REJECTED!! reason: {0}".format(data['reason']))
         print("\n" * 10)
-        for x in self.open_orders:
-            if x["order_id"] == data["order_id"]:
-                self.open_orders.remove(x)
-                break
+        pass
 
     def on_order_filled(self, data):
         if self.flagged:
@@ -154,67 +168,79 @@ class MarketBot(Protocol):
         self.values[data['symbol']] = data['price']
 
     def cancel_all(self):
-        for x in self.open_orders: 
-            cancel_msg = {"type": cancel, "order_id": x["order_id"]}
+        # for x in self.open_orders: 
+        print("calling cancel all")
+        print("\n"*10)
+        for x in self.open_orders:
+            print("canceling order: {0}".format(x['order_id']))
+            print("total orders: {0}".format(len(self.open_orders))) 
+            cancel_msg = {"type": "cancel", "order_id": x["order_id"]}
             self.message(cancel_msg)
-            self.open_orders.remove(x)
+        self.open_orders = []
+        self.spread = {
+            'FOO': [-99999999999,99999999999],
+            'BAR': [-99999999999,99999999999],
+            'BAZ': [-99999999999,99999999999],
+            'QUUX': [-99999999999,99999999999],
+            'CORGE': [-99999999999,99999999999],
+        }
 
     def on_book_status(self, data):
         """
         Handle more current information about the book
         Make offers depending on the spread price of the book
         """
+        if len(self.open_orders) == 0:
+            self.canceling = False
 
         if self.canceling:
+            print("CANCELING - still")
             return
 
-        if time.time() - self.last_cancel > self.cancel_time and not self.canceling:
-            print("CANCELING")
+        if time.time() - self.last_cancel > self.cancel_time:
             self.canceling = True   
             self.cancel_all()
             self.last_cancel = time.time()
+            print("CANCELING")
             return
-
-        if len(self.open_orders) == 0:
-            self.canceling = False
 
         symbol = data["symbol"]
         buy = data["buy"][0][0]
         sell = data["sell"][0][0]
 
-
         if (sell - buy > 2):
             buy += 1
             sell -= 1
+        else:
+            return
 
+        if (self.spread[symbol][0] > buy):
+            return 
 
-        #cancel open orders
-        '''for x in open_orders[symbol]: 
-            cancel_order = {"type": "cancel", "order_id": x["id"]}
-            self.message(cancel_order)
-            open_orders.remove(x)'''
-
+        if (self.spread[symbol][1] < sell):
+            return 
 
         #place new orders
         order_amt = 1
 
         buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
         self.message(buy_order)
-        self.open_orders.append(buy_order)
         self.order_count += 1
 
 
         sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
         self.message(sell_order)
-        self.open_orders.append(sell_order)
-        self.order_count += 1     
+        self.order_count += 1   
+
+        self.orders[buy_order['order_id']] = buy_order  
+        self.orders[sell_order['order_id']] = sell_order  
 
     def calculate_overall_position(self):
         overall = self.cash
         for symbol, position in self.positions.items():
             overall += self.values[symbol] * position 
-        print(overall)
-        self.csv.writerow([overall])
+        print("PNL: {0}".format(overall))
+        # self.csv.writerow([overall])
         return overall
 
     def on_hello(self, data):
