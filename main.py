@@ -127,7 +127,7 @@ class MarketBot(Protocol):
         Handle more current information about the book
         Make offers depending on the spread price of the book
         """
-        '''
+    
         symbol = data["symbol"]
         buy = data["buy"][0][0]
         sell = data["sell"][0][0]
@@ -157,7 +157,7 @@ class MarketBot(Protocol):
         self.message(sell_order)
         self.open_orders.append(sell_order)
         self.order_count += 1
-    '''
+
         
 
     def on_hello(self, data):
