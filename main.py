@@ -66,7 +66,7 @@ if __name__ == '__main__':
     f = MarketBotFactory()
 
     # connect factory to this host and port
-    reactor.connectTCP(TEST_PUBLIC_IP, JSON_PORT + SLOW_MARKET, f)
+    reactor.connectTCP(TEST_PRIVATE_IP, JSON_PORT + SLOW_MARKET, f)
 
     # run bot
     reactor.run()
