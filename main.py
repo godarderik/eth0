@@ -17,6 +17,8 @@ SLOW_MARKET = 0
 FAST_MARKET = 1
 EMPTY_MARKET = 2
 
+ALPHA_FACTOR = 0.1
+
 class MarketBot(Protocol):
     def __init__(self):
         """
@@ -24,6 +26,14 @@ class MarketBot(Protocol):
         """
         self.cash = 0
         self.positions = {
+            'FOO': 0,
+            'BAR': 0,
+            'BAZ': 0,
+            'QUUX': 0,
+            'CORGE': 0,
+        }
+
+        self.order_positions = {
             'FOO': 0,
             'BAR': 0,
             'BAZ': 0,
@@ -53,6 +63,7 @@ class MarketBot(Protocol):
             'QUUX': [-99999999999,99999999999],
             'CORGE': [-99999999999,99999999999],
         }
+
         # not sure about the type for this yet
         self.order_history = []
         self.open_orders = []
@@ -151,11 +162,7 @@ class MarketBot(Protocol):
                     self.positions[x["symbol"]] += x["size"]
                     self.cash -= x["size"] * x["price"]
                     break
-        # print self.cash
-        self.calculate_overall_position()
-        # for symbol, position in self.positions.items():
-        #     print("SYM: {0} POS: {1}".format(symbol, position))
-    
+        self.calculate_overall_position()    
 
     def on_out(self, data):
         pass
@@ -216,11 +223,18 @@ class MarketBot(Protocol):
         else:
             return
 
+        # make sure we don't shoot ourselves
         if (self.spread[symbol][0] > buy):
             return 
 
         if (self.spread[symbol][1] < sell):
             return 
+
+        # should we buy at all? based on our position
+
+        if (abs(self.positions[symbol]) > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0]):
+            print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
+            return
 
         #place new orders
         order_amt = 1
@@ -241,8 +255,6 @@ class MarketBot(Protocol):
         overall = self.cash
         for symbol, position in self.positions.items():
             overall += self.values[symbol] * position 
-        # print(overall)
-        # self.csv.writerow([overall])
         return overall
 
     def on_hello(self, data):
