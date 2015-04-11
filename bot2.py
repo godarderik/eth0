@@ -60,7 +60,7 @@ class MarketBot(Protocol):
         self.market_open = False
         self.flagged = True
         self.last_cancel = time.time()
-        self.cancel_time = 0
+        self.cancel_time = 1
         self.canceling = False
         self.file = open('data.p', 'w')
         self.csv = csv.writer(self.file)
@@ -218,7 +218,7 @@ class MarketBot(Protocol):
 
         print("PLACING ORDER")
         #place new orders
-        order_amt = 1
+        order_amt = 100
 
         buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
         self.message(buy_order)
