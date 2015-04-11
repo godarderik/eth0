@@ -126,6 +126,7 @@ class MarketBot(Protocol):
 
     def on_acknowledge(self, data):
         if (data['order_id'] in self.converts):
+            print "here"
             
             #sell off the reults of our converts
             sell_order_foo = {"type":"add", "order_id" : self.order_number, symbol:"FOO", "dir" : "SELL", "price" : self.convert_prices["foo"], "size" : int(.3 * self.convert_amount)}
