@@ -126,10 +126,12 @@ class MarketBot(Protocol):
 
     def on_acknowledge(self, data):
         if (data['order_id'] in self.converts):
-            print "here"
+            
             #sell off the reults of our converts
-            sell_order_foo = {"type":"add", "order_id" : data["order_id"], symbol:"FOO", "dir" : "SELL", "price" : self.convert_prices["foo"], "size" : int(.3 * self.convert_amount)}
-            sell_order_bar = {"type":"add", "order_id" : data["order_id"], symbol:"BAR", "dir" : "SELL", "price" : self.convert_prices["bar"], "size" : int(.8 * self.convert_amount)}
+            sell_order_foo = {"type":"add", "order_id" : self.order_number, symbol:"FOO", "dir" : "SELL", "price" : self.convert_prices["foo"], "size" : int(.3 * self.convert_amount)}
+            self.order_number += 1
+            sell_order_bar = {"type":"add", "order_id" : self.order_number, symbol:"BAR", "dir" : "SELL", "price" : self.convert_prices["bar"], "size" : int(.8 * self.convert_amount)}
+            self.order_number += 1
             self.message(sell_order_foo)
             self.message(sell_order_bar)
             self.converts.remove(data['order_id'])
@@ -221,19 +223,19 @@ class MarketBot(Protocol):
             #sell_etf_diff = corge_sell_price - .3 * foo_sell_price - .8 * bar_sell_price - 100
             print str(buy_etf_diff)
             if buy_etf_diff < 0: 
-                print '1'
+            
                 self.convert_amount = self.corge_book["buy"][0][1] - self.corge_book["buy"][0][1]%10 #must be multiple of 10 
-                print '2'
+            
                 self.converts.append(self.order_count)
-                print '3'
+        
                 convert_msg = {"type": "convert", "order_id":self.order_count, "symbol": "CORGE", "dir": "BUY", "size": self.convert_amount}
-                print '4'
+            
                 self.message(convert_msg)
                 self.order_count += 1
-                print '5'
+        
                 self.convert_prices["foo"] = foo_sell_price
                 self.convert_prices["bar"] = bar_sell_price
-                print '6'
+ 
 
             #elif sell_etf_diff > 0: 
             #    #sell etf and convert
