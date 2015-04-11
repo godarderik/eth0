@@ -201,10 +201,10 @@ class MarketBot(Protocol):
         else:
             return
 
-        if (self.spreads[symbol][0] > buy):
+        if (self.spreads[symbol][0] < buy):
             return 
 
-        if (self.spreads[symbol][1] < sell):
+        if (self.spreads[symbol][1] > sell):
             return 
 
         self.spreads[symbol][0] = buy
