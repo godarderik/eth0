@@ -207,11 +207,11 @@ class MarketBot(Protocol):
             print(207)
             return
 
-        if (self.spreads[symbol][0] > buy):
+        if (self.spread[symbol][0] > buy):
             print(211)
             return 
 
-        if (self.spreads[symbol][1] < sell):
+        if (self.spread[symbol][1] < sell):
             print(215)
             return 
 
