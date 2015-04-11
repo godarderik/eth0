@@ -173,6 +173,13 @@ class MarketBot(Protocol):
             cancel_msg = {"type": "cancel", "order_id": x["order_id"]}
             self.message(cancel_msg)
         self.open_orders = []
+        self.spread = {
+            'FOO': [-99999999999,99999999999],
+            'BAR': [-99999999999,99999999999],
+            'BAZ': [-99999999999,99999999999],
+            'QUUX': [-99999999999,99999999999],
+            'CORGE': [-99999999999,99999999999],
+        }
 
     def on_book_status(self, data):
         """
@@ -180,7 +187,7 @@ class MarketBot(Protocol):
         Make offers depending on the spread price of the book
         """
 
-        print(len(self.open_orders))
+        print("Open orders: {0}".format(len(self.open_orders)))
 
         if len(self.open_orders) == 0:
             self.canceling = False
