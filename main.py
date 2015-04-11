@@ -45,13 +45,65 @@ class MarketBot(Protocol):
         """
         Do something with the data
         """
-        print(data)
-        return 
         message_data = json.loads(data)
-        if message_data['type'] == 'hello':
-            self.onHello(message_data)
 
-    def onHello(self, data):
+        # publicly exchanged information
+        if message_data['type'] == 'trade':
+            self.on_public_trade(message_data)
+        elif message_data['type'] == 'book':
+            self.on_book_status(message_data)
+
+        # handle our own order information
+        elif message_data['type'] == 'ack':
+            self.on_acknowledge(message_data)
+        elif message_data['type'] == 'reject':
+            self.on_rejection(message_data)
+        elif message_data['type'] == 'fill':
+            self.on_order_filled(message_data)
+        elif message_data['type'] == 'out':
+            self.on_out(message_data) 
+
+        # boilerplate stuff
+        elif message_data['type'] == 'hello':
+            self.on_hello(message_data)
+        elif message_data['type'] == 'market_open':
+            self.on_market_open(message_data)
+        elif message_data['type'] == 'error':
+            self.on_error(message_data)
+
+    def on_acknowledge(self, data):
+        """
+
+        """
+
+    def on_rejection(self, data):
+        """
+        Cry
+        """
+
+    def on_stuff(self, data):
+        """
+
+        """
+
+    def on_stuff(self, data):
+        """
+
+        """
+
+
+
+    def on_public_trade(self, data):
+        """
+        Handle a public trade on the market
+        """
+
+    def on_book_status(self, data):
+        """
+        Handle more current information about the book
+        """
+
+    def on_hello(self, data):
         """
         Handle the hello handshake response
         """
@@ -62,6 +114,18 @@ class MarketBot(Protocol):
         print("connected to exchange\nCash: {0}".format(self.cash))
         for symbol, position in self.positions.items():
             print("SYM: {0} POS: {1}".format(symbol, position))
+
+    def on_market_open(self, data):
+        self.market_open = data['open']
+        """
+        Do we need to do more?
+        """
+
+    def on_error(self, data):
+        """
+        Do stuff
+        """
+        print(data)
 
     def message(self, message):
         self.transport.write(message + '\n')
