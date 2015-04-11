@@ -63,12 +63,13 @@ class MarketBot(Protocol):
         Do something with the data
         """
         if (self.flagged):
-            for datum in data.split('\n'):
-                print(datum, '\n\n\n')
+            for datum in data.split('\n')[:-1]:
+                print(datum)
                 try:
                     datum = json.loads(datum.strip())
+                    self.handle_single_message(datum)
                 except:            
-                    print(datum)
+                    pass
             self.flagged = False
         return
     
