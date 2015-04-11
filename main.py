@@ -123,6 +123,7 @@ class MarketBot(Protocol):
                 break
 
     def on_out(self, data):
+        pass
 
     def on_public_trade(self, data):
         """
