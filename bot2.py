@@ -224,13 +224,13 @@ class MarketBot(Protocol):
             return 
 
         #place new orders
-        buy_order_amt = math.floor(100*(sell-buy)/50*math.e**(-1*self.positions[symbol]/100))
+        buy_order_amt = int(.1 * (sell - buy))
 
         buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : buy_order_amt}
         self.message(buy_order)
         self.order_count += 1
 
-        sell_order_amt = 50 - sell_order_amt
+        sell_order_amt = buy_order_amt
         if sell_order_amt < 0: 
             sell_order_amt = 0
 
