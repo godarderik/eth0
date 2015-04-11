@@ -259,7 +259,7 @@ class MarketBot(Protocol):
 
 
         symbol = data["symbol"]
-
+        print symbol
         if symbol == "CORGE": 
             self.corge_book = data
         elif symbol == "FOO":
