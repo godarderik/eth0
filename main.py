@@ -74,8 +74,6 @@ class MarketBot(Protocol):
         handle a single message
         """
 
-        print "hanle"
-
         # publicly exchanged information
         if data['type'] == 'trade':
             self.on_public_trade(data)
