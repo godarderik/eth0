@@ -221,13 +221,19 @@ class MarketBot(Protocol):
             #sell_etf_diff = corge_sell_price - .3 * foo_sell_price - .8 * bar_sell_price - 100
             print str(buy_etf_diff)
             if buy_etf_diff < 0: 
+                print '1'
                 self.convert_amount = self.corge_book["buy"][0][1] - self.corge_book["buy"][0][1]%10 #must be multiple of 10 
+                print '2'
                 self.converts.append(self.order_count)
+                print '3'
                 convert_msg = {"type": "convert", "order_id": data["order_id"], "symbol": "CORGE", "dir": "BUY", "size": self.convert_amount}
+                print '4'
                 self.message(convert_msg)
                 self.order_count += 1
+                print '5'
                 self.convert_prices["foo"] = foo_sell_price
                 self.convert_prices["bar"] = bar_sell_price
+                print '6'
 
             #elif sell_etf_diff > 0: 
             #    #sell etf and convert
