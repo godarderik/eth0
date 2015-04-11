@@ -189,7 +189,7 @@ class MarketBot(Protocol):
             print("CANCELING - still")
             return
 
-        if time.time() - self.last_cancel > self.cancel_time and not self.canceling:
+        if time.time() - self.last_cancel > self.cancel_time:
             self.canceling = True   
             self.cancel_all()
             self.last_cancel = time.time()
@@ -200,19 +200,23 @@ class MarketBot(Protocol):
         buy = data["buy"][0][0]
         sell = data["sell"][0][0]
 
-
         if (sell - buy > 2):
             buy += 1
             sell -= 1
         else:
+            print(207)
             return
 
         if (self.spreads[symbol][0] > buy):
+            print(211)
             return 
 
         if (self.spreads[symbol][1] < sell):
+            print(215)
             return 
 
+
+        print("PLACING ORDER")
         #place new orders
         order_amt = 1
 
