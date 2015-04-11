@@ -109,7 +109,7 @@ class MarketBot(Protocol):
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
-                self.positions{x["symbol"] += x["size"]
+                self.positions[x["symbol"]] += x["size"]
                 self.cash -= x["size"] * x["price"]
                 break
 
