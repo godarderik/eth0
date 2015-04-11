@@ -261,11 +261,11 @@ class MarketBot(Protocol):
         symbol = data["symbol"]
 
         if symbol == "CORGE": 
-            corge_book = data
+            self.corge_book = data
         elif symbol == "FOO":
-            foo_book = data
+            self.foo_book = data
         elif symbol == "BAR":
-            bar_book = data
+            self.bar_book = data
 
         self.etf_artbitrage()
         '''
