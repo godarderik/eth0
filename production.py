@@ -277,10 +277,11 @@ class MarketBotFactory(protocol.ClientFactory):
     A new protocol instance will be created each time we connect to the server.
     """
 
-    def __init__(self):
+    def __init__(self, drop=False):
         """
         Do something clever here
         """
+        self.drop = drop
         pass
 
     def buildProtocol(self, addr):
@@ -300,8 +301,16 @@ if __name__ == '__main__':
     # initialize logging
     log.startLogging(sys.stdout)
     
+    if len(sys.argv) > 1:
+        drop = True
+    else:
+        drop = False
+
+    if drop:
+        print("DROPPING...\n\n\n\n")
+
     # create factory protocol and application
-    f = MarketBotFactory()
+    f = MarketBotFactory(drop=drop)
 
     # connect factory to this host and port
     reactor.connectTCP(PRODUCTION_IP, JSON_PORT, f)

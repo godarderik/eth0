@@ -1,18 +1,20 @@
+"""
+The smart ideas ported over to production
+"""
 # twisted imports
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet import reactor, protocol
 from twisted.python import log
-from twisted.internet.defer import setDebugging
 import json
 import pickle
 import csv
 
-setDebugging(True)
 # system imports
 import time, sys
 
 TEST_PUBLIC_IP = "52.1.34.5"
 TEST_PRIVATE_IP = "10.0.138.127"
+PRODUCTION_IP = "localhost"
 
 LOCAL_FORWARD_IP = "localhost"
 
@@ -21,9 +23,7 @@ SLOW_MARKET = 0
 FAST_MARKET = 1
 EMPTY_MARKET = 2
 
-ALPHA_FACTOR = 1.0
 ORDER_AMOUNT = 1
-
 
 class MarketBot(Protocol):
     def __init__(self):
@@ -32,14 +32,6 @@ class MarketBot(Protocol):
         """
         self.cash = 0
         self.positions = {
-            'FOO': 0,
-            'BAR': 0,
-            'BAZ': 0,
-            'QUUX': 0,
-            'CORGE': 0,
-        }
-
-        self.order_positions = {
             'FOO': 0,
             'BAR': 0,
             'BAZ': 0,
@@ -69,7 +61,6 @@ class MarketBot(Protocol):
             'QUUX': [-99999999999,99999999999],
             'CORGE': [-99999999999,99999999999],
         }
-
         # not sure about the type for this yet
         self.order_history = []
         self.open_orders = []
@@ -77,7 +68,7 @@ class MarketBot(Protocol):
         self.market_open = False
         self.flagged = True
         self.last_cancel = time.time()
-        self.cancel_time = 5
+        self.cancel_time = 1
         self.canceling = False
         self.file = open('data.csv', 'w')
         self.csv = csv.writer(self.file)
@@ -87,7 +78,7 @@ class MarketBot(Protocol):
         # maybe do something here
         print("Connected.")
         # now do the hello handshake
-        self.message({"type": "hello", "team": "A"})
+        self.message({"type": "hello", "team": "STRAWBERRYBLUE"})
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
@@ -148,23 +139,15 @@ class MarketBot(Protocol):
         print("\n" * 10)
         pass
 
-    def cancel_all_buy_symbol(self, symbol):
-        print("SYM: {0} canceling buy orders {1}".format(symbol, self.positions[symbol]))
-
-        for order in filter(lambda x: x['symbol'] == symbol and x['dir'] == 'BUY', self.open_orders):
-            print(order['symbol'])
-            cancel_msg = {"type": "cancel", "order_id": order["order_id"]}
-            self.message(cancel_msg)
-
-    def cancel_all_sell_symbol(self, symbol):
-        print("SYM: {0} canceling sell orders {1}".format(symbol, self.positions[symbol]))
-
-        for order in filter(lambda x    : x['symbol'] == symbol and x['dir'] == "SELL", self.open_orders):
-            print(order['symbol'])
-            cancel_msg = {"type": "cancel", "order_id": order["order_id"]}
-            self.message(cancel_msg)
-
     def on_order_filled(self, data):
+        if self.flagged:
+            self.flagged = False
+            print("ORDER FILLED : {0}".format(data['order_id']))
+            print self.cash
+            # for symbol, position in self.positions.items():
+            #     print("SYM: {0} POS: {1}".format(symbol, position))
+            print(len(self.open_orders))
+            print(data)
         for x in self.open_orders:
             if x["order_id"] == data["order_id"]:
                 self.open_orders.remove(x)
@@ -176,15 +159,11 @@ class MarketBot(Protocol):
                     self.positions[x["symbol"]] += x["size"]
                     self.cash -= x["size"] * x["price"]
                     break
-
-        symbol = data['symbol']
-        if self.positions[symbol] > 200:
-            self.cancel_all_buy_symbol(symbol)
-        
-        if self.positions[symbol] < -200:
-            self.cancel_all_sell_symbol(symbol)
-
-        self.calculate_overall_position()    
+        # print self.cash
+        self.calculate_overall_position()
+        # for symbol, position in self.positions.items():
+        #     print("SYM: {0} POS: {1}".format(symbol, position))
+    
 
     def on_out(self, data):
         pass
@@ -196,18 +175,9 @@ class MarketBot(Protocol):
         self.values[data['symbol']] = data['price']
 
     def cancel_all(self):
-        # for x in self.open_orders: 
-        self.last_cancel = time.time()
-        print("calling cancel all")
-
-        for symbol, position in self.positions.items():
-            print("SYM: {0}|POS: {1}".format(symbol, position))
-
+        messages = []
         for x in self.open_orders:
-            #print("canceling order: {0}".format(x['order_id']))
-            #print("total orders: {0}".format(len(self.open_orders))) 
-            cancel_msg = {"type": "cancel", "order_id": x["order_id"]}
-            self.message(cancel_msg)
+            self.message({"type": "cancel", "order_id": x["order_id"]})
         self.open_orders = []
         self.spread = {
             'FOO': [-99999999999,99999999999],
@@ -222,68 +192,50 @@ class MarketBot(Protocol):
         Handle more current information about the book
         Make offers depending on the spread price of the book
         """
-
         if len(self.open_orders) == 0:
             self.canceling = False
 
-        if self.canceling:
-            print("CANCELING - still - {0}".format(len(self.open_orders)))
+        if time.time() - self.last_cancel > self.cancel_time:
+            print("CANCELING")
+            self.canceling = True   
+            self.last_cancel = time.time()
             self.cancel_all()
             return
 
-        if time.time() - self.last_cancel > self.cancel_time:
-            self.canceling = True
-            self.cancel_all()
-            print("CANCELING")
+        if self.canceling:
+            if self.last_cancel - time.time() > 5:
+                print("it's been long enough, wiping")
+                self.open_orders = [] # forget about the orders
+                self.canceling = False
+            print("CANCELING - still - {0}".format(len(self.open_orders)))
             return
+
 
         symbol = data["symbol"]
         buy = data["buy"][0][0]
         sell = data["sell"][0][0]
 
+        should_buy = True
+        should_sell = True
+
         if (sell - buy > 2):
             buy += 1
             sell -= 1
         else:
-            print("not enough margin {0}".format(sell - buy))
             return
 
-        # figure out if we should buy or sell or not
-        should_buy = True
-        should_sell = True
-
-        # make sure we don't shoot ourselves
+        # don't penny ourselves
         if (self.spread[symbol][0] > buy):
-            should_buy = False 
+            should_buy = False
 
         if (self.spread[symbol][1] < sell):
             should_sell = False
 
-        # should we buy at all? based on our position
-        if self.positions[symbol] > 200:
-            should_buy = False
-            self.cancel_all_buy_symbol(symbol)
-        
-        if self.positions[symbol] < -200:
-            should_sell = False
-            self.cancel_all_sell_symbol(symbol)
-
         #place new orders
         order_amt = ORDER_AMOUNT
 
-        if not (should_buy or should_sell):
-            print("neither buying or selling...")
-            return
-
         if should_buy:
-            buy_order = {
-                "type": "add", 
-                "order_id" : self.order_count, 
-                "symbol" : symbol, 
-                "dir" : "BUY", 
-                "price" : buy, 
-                "size" : order_amt
-            }
+            buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
             self.message(buy_order)
             self.order_count += 1
             self.orders[buy_order['order_id']] = buy_order  
@@ -292,16 +244,16 @@ class MarketBot(Protocol):
             sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
             self.message(sell_order)
             self.order_count += 1   
-            self.orders[sell_order['order_id']] = sell_order
+            self.orders[sell_order['order_id']] = sell_order  
 
 
     def calculate_overall_position(self):
-    	overall = self.cash
+        overall = self.cash
         for symbol, position in self.positions.items():
             overall += self.values[symbol] * position 
-        print("PNL {0}".format(overall))
-        self.csv.writerow([overall])
-    	return overall
+        print("PNL: {0}".format(overall))
+        # self.csv.writerow([overall])
+        return overall
 
     def on_hello(self, data):
         """
@@ -327,6 +279,9 @@ class MarketBot(Protocol):
         """
         print(data)
 
+    def message_multiple(self, messages):
+        self.transport.write('\n'.join([json.dumps(message) for message in messages]) + '\n')
+
     def message(self, message):
         self.transport.write(json.dumps(message) + '\n')
 
@@ -337,10 +292,11 @@ class MarketBotFactory(protocol.ClientFactory):
     A new protocol instance will be created each time we connect to the server.
     """
 
-    def __init__(self):
+    def __init__(self, drop=False):
         """
         Do something clever here
         """
+        self.drop = drop
         pass
 
     def buildProtocol(self, addr):
@@ -360,8 +316,16 @@ if __name__ == '__main__':
     # initialize logging
     log.startLogging(sys.stdout)
     
+    if len(sys.argv) > 1:
+        drop = True
+    else:
+        drop = False
+
+    if drop:
+        print("DROPPING...\n\n\n\n")
+
     # create factory protocol and application
-    f = MarketBotFactory()
+    f = MarketBotFactory(drop=drop)
 
     # connect factory to this host and port
     reactor.connectTCP(LOCAL_FORWARD_IP, 8888, f)
