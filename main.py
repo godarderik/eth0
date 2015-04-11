@@ -56,7 +56,7 @@ class MarketBot(Protocol):
         # maybe do something here
         print("Connected.")
         # now do the hello handshake
-        self.message({"type": "hello", "team": "STRAWBERRYRRR"})
+        self.message({"type": "hello", "team": "STRAWBERRYRR"})
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
@@ -109,12 +109,17 @@ class MarketBot(Protocol):
                 open_orders.remove(x)
                 break
     def on_order_filled(self, data):
+
+        print self.cash
+        # for symbol, position in self.positions.items():
+        #     print("SYM: {0} POS: {1}".format(symbol, position))
         for x in open_orders:
             if x["order_id"] == data["order_id"]:
                 open_orders.remove(x)
                 if x["dir"] == "SELL":
                     self.positions[x["symbol"]] -= x["size"]
                     self.cash += x["size"] * x["price"]
+
                     break
                 elif x["dir"] == "BUY": 
                     self.positions[x["symbol"]] += x["size"]
@@ -123,6 +128,10 @@ class MarketBot(Protocol):
         print self.cash
         for symbol, position in self.positions.items():
             print("SYM: {0} POS: {1}".format(symbol, position))
+                else: 
+                    self.positions[x["symbol"]] += x["size"]
+                    self.cash -= x["size"] * x["price"]
+                break
 
     def on_out(self, data):
         pass
@@ -132,12 +141,6 @@ class MarketBot(Protocol):
         Handle a public trade on the market
         """
         pass
-
-    def cancel_all(self): 
-        for x in open_orders:
-            cancel_order = {"type": "cancel", "order_id": x["id"]}
-            self.message(cancel_order)
-            open_orders.remove(x)
 
     def on_book_status(self, data):
         """
@@ -157,6 +160,14 @@ class MarketBot(Protocol):
         if (sell - buy > 2):
             buy += 1
             sell -= 1
+
+
+        #cancel open orders
+        '''for x in open_orders[symbol]: 
+            cancel_order = {"type": "cancel", "order_id": x["id"]}
+            self.message(cancel_order)
+            open_orders.remove(x)'''
+
 
         #place new orders
         order_amt = 1
