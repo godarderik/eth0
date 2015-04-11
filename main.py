@@ -47,6 +47,7 @@ class MarketBot(Protocol):
         self.open_orders = {}
         self.order_count = 0
         self.market_open = False
+        self.flagged = True
 
     def connectionMade(self):
         # maybe do something here
@@ -61,35 +62,50 @@ class MarketBot(Protocol):
         """
         Do something with the data
         """
-        message_data = json.loads(data)
+        if (self.flagged):
+            print(data)
+            print(data[:10])
+            print(type(data))
+            print(dir(data))
+            self.flagged = False
+        return
+    
+        for datum in data.split('\n'):
+            a = json.loads(datum)
+            self.handle_single_message(a)
+
+    def handle_single_message(self, data):
+        """
+        handle a single message
+        """
 
         # publicly exchanged information
-        if message_data['type'] == 'trade':
-            self.on_public_trade(message_data)
-        elif message_data['type'] == 'book':
-            self.on_book_status(message_data)
+        if data['type'] == 'trade':
+            self.on_public_trade(data)
+        elif data['type'] == 'book':
+            self.on_book_status(data)
 
         # handle our own order information
-        elif message_data['type'] == 'ack':
-            self.on_acknowledge(message_data)
-        elif message_data['type'] == 'reject':
-            self.on_rejection(message_data)
-        elif message_data['type'] == 'fill':
-            self.on_order_filled(message_data)
-        elif message_data['type'] == 'out':
-            self.on_out(message_data) 
+        elif data['type'] == 'ack':
+            self.on_acknowledge(data)
+        elif data['type'] == 'reject':
+            self.on_rejection(data)
+        elif data['type'] == 'fill':
+            self.on_order_filled(data)
+        elif data['type'] == 'out':
+            self.on_out(data)
 
         # boilerplate stuff
-        elif message_data['type'] == 'hello':
-            self.on_hello(message_data)
-        elif message_data['type'] == 'market_open':
-            self.on_market_open(message_data)
-        elif message_data['type'] == 'error':
-            self.on_error(message_data)
+        elif data['type'] == 'hello':
+            self.on_hello(data)
+        elif data['type'] == 'market_open':
+            self.on_market_open(data)
+        elif data['type'] == 'error':
+            self.on_error(data)
 
     def on_acknowledge(self, data):
         """
-
+        
         """
         pass
 
