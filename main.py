@@ -232,9 +232,17 @@ class MarketBot(Protocol):
 
         # should we buy at all? based on our position
 
-        if (abs(self.positions[symbol]) > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0]):
-            print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
-            return
+        if self.positions[symbol] > 0:
+            # we only want to buy as long as the overall is small
+            if (self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
+                print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
+                return
+        
+        if self.positions[symbol] < 0:
+            # we only want to buy as long as the overall is small
+            if (-1 * self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
+                print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
+                return
 
         #place new orders
         order_amt = 1
