@@ -45,7 +45,6 @@ class MarketBot(Protocol):
         # not sure about the type for this yet
         self.order_history = []
         self.open_orders = []
-        self.order_ids =
         self.order_count = 0
         self.market_open = False
         self.flagged = True
