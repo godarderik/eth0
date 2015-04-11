@@ -62,7 +62,7 @@ class MarketBot(Protocol):
         self.last_cancel = time.time()
         self.cancel_time = 5
         self.canceling = False
-        self.file = open('data.p', 'w')
+        self.file = open('data.csv', 'w')
         self.csv = csv.writer(self.file)
         self.orders = {}
 
@@ -118,6 +118,9 @@ class MarketBot(Protocol):
         order = self.orders[data['order_id']]
         self.open_orders.append(order)
         # update the spread
+        if order['symbol'] == 'BAZ':
+            self.csv.writerow([order['price']])
+
         if order['dir'] == 'BUY':
             self.spread[order['symbol']][0] = order['price']
         elif order['dir'] == 'SELL':
