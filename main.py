@@ -49,6 +49,8 @@ class MarketBot(Protocol):
         self.order_count = 0
         self.market_open = False
         self.flagged = True
+        self.last_cancel = time.time()
+        self.cancel_time = 5
 
     def connectionMade(self):
         # maybe do something here
@@ -136,6 +138,10 @@ class MarketBot(Protocol):
         Handle more current information about the book
         Make offers depending on the spread price of the book
         """
+
+        if time.time() - self.last_cancel > self.cancel_time:
+            self.cancel_all()
+            self.last_cancel = time.time()
 
         symbol = data["symbol"]
         buy = data["buy"][0][0]
