@@ -57,6 +57,15 @@ class MarketBot(Protocol):
         # not sure about the type for this yet
         self.order_history = []
         self.open_orders = []
+
+        self.corge_book = {}
+        self.foo_book = {}
+        self.bar_book = {}
+
+        self.converts = []
+        self.convert_amount = 0 
+        self.convert_prices = {}
+
         self.order_count = 0
         self.market_open = False
         self.flagged = True
@@ -116,16 +125,25 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        order = self.orders[data['order_id']]
-        self.open_orders.append(order)
-        # update the spread
-        if order['symbol'] == 'BAZ':
-            self.csv.writerow([order['price']])
+        if (data['order_id'] in self.converts):
+            #sell off the reults of our converts
+            sell_order_foo = {"type":"add", "order_id" : data["order_id"], "FOO" : symbol, "dir" : "SELL", "price" : self.convert_prices{"foo"}, "size" : int(.3 * self.convert_amount)}
+            sell_order_bar = {"type":"add", "order_id" : data["order_id"], "BAR" : symbol, "dir" : "SELL", "price" : self.convert_prices{"bar"}, "size" : int(.8 * self.convert_amount)}
+            self.message(sell_order_foo)
+            self.message(sell_order_bar)
+            self.converts.remove(data['order_id'])
 
-        if order['dir'] == 'BUY':
-            self.spread[order['symbol']][0] = order['price']
-        elif order['dir'] == 'SELL':
-            self.spread[order['symbol']][1] = order['price']
+        else: 
+            order = self.orders[data['order_id']]
+            self.open_orders.append(order)
+            # update the spread
+            if order['symbol'] == 'BAZ':
+                self.csv.writerow([order['price']])
+
+            if order['dir'] == 'BUY':
+                self.spread[order['symbol']][0] = order['price']
+            elif order['dir'] == 'SELL':
+                self.spread[order['symbol']][1] = order['price']
 
     def on_rejection(self, data):
         print("REJECTED!! reason: {0}".format(data['reason']))
@@ -185,6 +203,37 @@ class MarketBot(Protocol):
             'CORGE': [-99999999999,99999999999],
         }
 
+
+    def etf_artbitrage(self,data):
+
+        if corge_book != {} and foo_book != {} and bar_book != {}:
+            corge_buy_price = corge_book["buy"][0][0]
+            corge_sell_price = corge_book["sell"][0][0]
+
+            foo_buy_price = foo_book["buy"][0][0]
+            foo_sell_price = foo_book["sell"][0][0]
+
+            foo_buy_price = foo_book["buy"][0][0]
+            foo_sell_price = foo_book["sell"][0][0]
+
+            buy_etf_diff = .3 * foo_sell_price + .8 bar_sell_price - corge_buy_price - 100
+            sell_etf_diff = corge_sell_price - .3 * foo_sell_price - .8 bar_sell_price - 100
+            if buy_etf_diff > 0: 
+                self.convert_amount = corge_book["buy"][0][1] - corge_book["buy"][0][1]%10 #must be multiple of 10 
+                self.converts.append(self.order_count)
+                convert_msg = {"type": "convert", "order_id": data["order_id"], "symbol": "CORGE", "dir": "BUY", "size": self.convert_amount}
+                self.message(convert_msg)
+                self.order_count += 1
+                self.convert_prices{"foo"} = foo_sell_price
+                self.convert_prices{"bar"} = foo_bar_price
+
+            elif sell_etf_diff > 0: 
+                #sell etf and convert
+                pass
+
+
+
+
     def on_book_status(self, data):
         """
         Handle more current information about the book
@@ -207,7 +256,18 @@ class MarketBot(Protocol):
             print("CANCELING")
             return
 
+
         symbol = data["symbol"]
+
+        if symbol == "CORGE": 
+            corge_book = data
+        elif symbol == "FOO":
+            foo_book = data
+        elif symbol == "BAR":
+            bar_book = data
+
+        self.etf_artbitrage()
+        '''
         buy = data["buy"][0][0]
         sell = data["sell"][0][0]
 
@@ -222,7 +282,7 @@ class MarketBot(Protocol):
 
         if (self.spread[symbol][1] < sell):
             return 
-
+            
         #place new orders
         buy_order_amt = int(math.floor(100*(sell-buy)/50*math.e**(-1*self.positions[symbol]/100)))
 
@@ -240,6 +300,7 @@ class MarketBot(Protocol):
 
         self.orders[buy_order['order_id']] = buy_order  
         self.orders[sell_order['order_id']] = sell_order  
+        '''
 
     def calculate_overall_position(self):
         overall = self.cash
