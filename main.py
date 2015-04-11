@@ -115,9 +115,11 @@ class MarketBot(Protocol):
                 if x["dir"] == "SELL":
                     self.positions[x["symbol"]] -= x["size"]
                     self.cash += x["size"] * x["price"]
+                    break
                 elif x["dir"] == "BUY": 
                     self.positions[x["symbol"]] += x["size"]
                     self.cash -= x["size"] * x["price"]
+                    break
         print self.cash
         for symbol, position in self.positions.items():
             print("SYM: {0} POS: {1}".format(symbol, position))
