@@ -99,7 +99,6 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        print "ack"
         pass
 
     def on_rejection(self, data):
