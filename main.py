@@ -36,7 +36,7 @@ class MarketBot(Protocol):
         # maybe do something here
         print("Connected.")
         # now do the hello handshake
-        self.message('{"type": "hello", "team": "strawberry"}\n')
+        self.message(json.dumps({"type": "hello", "team": "STRAWBERRY"}))
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
@@ -45,6 +45,8 @@ class MarketBot(Protocol):
         """
         Do something with the data
         """
+        print(data)
+        return 
         message_data = json.loads(data)
         if message_data['type'] == 'hello':
             self.onHello(message_data)
