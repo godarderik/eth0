@@ -149,7 +149,7 @@ class MarketBot(Protocol):
         self.values[data['symbol']] = data['price']
 
     def cancel_all(self):
-        for x in self.open_orders: 
+        # for x in self.open_orders: 
         print("calling cancel all")
         print("\n"*10)
         for x in self.open_orders:
