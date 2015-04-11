@@ -114,6 +114,8 @@ class MarketBot(Protocol):
         print self.cash
         # for symbol, position in self.positions.items():
         #     print("SYM: {0} POS: {1}".format(symbol, position))
+        print(self.open_orders)
+        print(data)
         for x in self.open_orders:
             if x["order_id"] == data["order_id"]:
                 open_orders.remove(x)
