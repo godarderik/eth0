@@ -128,10 +128,7 @@ class MarketBot(Protocol):
         print self.cash
         for symbol, position in self.positions.items():
             print("SYM: {0} POS: {1}".format(symbol, position))
-                else: 
-                    self.positions[x["symbol"]] += x["size"]
-                    self.cash -= x["size"] * x["price"]
-                break
+    
 
     def on_out(self, data):
         pass
@@ -141,6 +138,12 @@ class MarketBot(Protocol):
         Handle a public trade on the market
         """
         pass
+
+    def cancel_all(self):
+        for x in open_orders: 
+            cancel_msg = {"type": cancel, "order_id": x["order_id"]}
+            self.message(cancel_msg)
+            open_orders.remove(x)
 
     def on_book_status(self, data):
         """
