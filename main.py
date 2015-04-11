@@ -44,12 +44,8 @@ class MarketBot(Protocol):
         }
         # not sure about the type for this yet
         self.order_history = []
-        self.open_orders = {'FOO': [],
-            'BAR': [],
-            'BAZ': [],
-            'QUUX': [],
-            'CORGE': [],
-        }
+        self.open_orders = []
+        self.order_ids =
         self.order_count = 0
         self.market_open = False
         self.flagged = True
@@ -103,29 +99,22 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        """
-        
-        """
-
-        
         pass
 
     def on_rejection(self, data):
-        """
-        Cry
-        """
-        pass
-
+        for x in open_orders:
+            if x["id"] == data["order_id"]:
+                open_orders.remove(x)
+                break
     def on_order_filled(self, data):
-        """
-
-        """
-        pass
+        for x in open_orders:
+            if x["id"] == data["order_id"]:
+                open_orders.remove(x)
+                self.positions{x["symbol"] += x["size"]
+                self.cash -= x["size"] * x["price"]
+                break
 
     def on_out(self, data):
-        """
-
-        """
         pass
 
     def on_public_trade(self, data):
@@ -152,23 +141,23 @@ class MarketBot(Protocol):
         #cancel open orders
         for x in open_orders[symbol]: 
             cancel_order = {"type": "cancel", "order_id": x["id"]}
-            #execute
-            open_orders[symbol].remove(x)
+            self.message(cancel_order)
+            open_orders.remove(x)
 
 
         #place new orders
         order_amt = 100
 
-        buy_order = {"type":"ADD", "order_id" = order_count, "symbol" = symbol, "dir" = "BUY", "price" = buy, "size" = order_amt}
+        buy_order = {"type":"ADD", "order_id" = self.order_count, "symbol" = symbol, "dir" = "BUY", "price" = buy, "size" = order_amt}
         self.message(buy_order)
-        self.open_orders[symbol].append(buy_order)
-        order_count += 1
+        self.open_orders.append(buy_order)
+        self.order_count += 1
 
 
-        sell_order = {"type":"ADD", "order_id" = str(order_count), "symbol" = symbol, "dir" = "SELL", "price" = sell, "size" = order_amt}
+        sell_order = {"type":"ADD", "order_id" = self.order_count, "symbol" = symbol, "dir" = "SELL", "price" = sell, "size" = order_amt}
         self.message(sell_order)
-        self.open_orders[symbol].append(sell_order)
-        order_count += 1
+        self.open_orders.append(sell_order)
+        self.order_count += 1
 
         
 
