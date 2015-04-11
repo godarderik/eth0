@@ -197,8 +197,6 @@ class MarketBot(Protocol):
         Make offers depending on the spread price of the book
         """
 
-        print("Open orders: {0}".format(len(self.open_orders)))
-
         if len(self.open_orders) == 0:
             self.canceling = False
 
