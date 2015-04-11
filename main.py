@@ -57,7 +57,7 @@ class MarketBot(Protocol):
         # maybe do something here
         print("Connected.")
         # now do the hello handshake
-        self.message({"type": "hello", "team": "STRAWBERRYRRRRB"})
+        self.message({"type": "hello", "team": "STRAWBERRYRRRRBB"})
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
@@ -129,7 +129,7 @@ class MarketBot(Protocol):
                     self.positions[x["symbol"]] += x["size"]
                     self.cash -= x["size"] * x["price"]
                     break
-        print self.cash
+        # print self.cash
         self.calculate_overall_position()
         # for symbol, position in self.positions.items():
         #     print("SYM: {0} POS: {1}".format(symbol, position))
