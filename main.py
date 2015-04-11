@@ -44,7 +44,12 @@ class MarketBot(Protocol):
         }
         # not sure about the type for this yet
         self.order_history = []
-        self.open_orders = {}
+        self.open_orders = {'FOO': [],
+            'BAR': [],
+            'BAZ': [],
+            'QUUX': [],
+            'CORGE': [],
+        }
         self.order_count = 0
         self.market_open = False
         self.flagged = True
@@ -107,6 +112,8 @@ class MarketBot(Protocol):
         """
         
         """
+
+        
         pass
 
     def on_rejection(self, data):
@@ -150,14 +157,26 @@ class MarketBot(Protocol):
 
         #cancel open orders
         for x in open_orders[symbol]: 
-            self.message("CANCEL " + str(x) )
+            cancel_order = {"type": "cancel", "order_id": x["id"]}
+            #execute
+            open_orders[symbol].remove(x)
+
 
         #place new orders
-        
         order_amt = 100
 
-        self.message("ADD " + str(order_count) + symbol + "BUY " + str(buy) + str(order_amt))
-        self.message("ADD " + str(order_count) + symbol + "SELL " + str(sell) + str(order_amt))
+        buy_order = {"type":"ADD", "order_id" = order_count, "symbol" = symbol, "dir" = "BUY", "price" = buy, "size" = order_amt}
+        self.message(buy_order)
+        self.open_orders[symbol].append(buy_order)
+        order_count += 1
+
+
+        sell_order = {"type":"ADD", "order_id" = str(order_count), "symbol" = symbol, "dir" = "SELL", "price" = sell, "size" = order_amt}
+        self.message(sell_order)
+        self.open_orders[symbol].append(sell_order)
+        order_count += 1
+
+        
 
     def on_hello(self, data):
         """
@@ -184,7 +203,7 @@ class MarketBot(Protocol):
         print(data)
 
     def message(self, message):
-        self.transport.write(message + '\n')
+        self.transport.write(json.dumps(message) + '\n')
 
 class MarketBotFactory(protocol.ClientFactory):
     """
