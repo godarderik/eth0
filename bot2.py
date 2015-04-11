@@ -212,7 +212,6 @@ class MarketBot(Protocol):
 
             foo_buy_price = self.foo_book["buy"][0][0]
             foo_sell_price = self.foo_book["sell"][0][0]
-            print "2"
             bar_buy_price = self.bar_book["buy"][0][0]
             bar_sell_price = self.bar_book["sell"][0][0]
 
