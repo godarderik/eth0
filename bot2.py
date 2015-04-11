@@ -205,7 +205,7 @@ class MarketBot(Protocol):
 
 
     def etf_artbitrage(self):
-
+        print "here1"
         if self.corge_book != {} and self.foo_book != {} and self.bar_book != {}:
             print "here"
             scorge_buy_price = self.corge_book["buy"][0][0]
@@ -259,7 +259,6 @@ class MarketBot(Protocol):
 
 
         symbol = data["symbol"]
-        print symbol
         if symbol == "CORGE": 
             self.corge_book = data
         elif symbol == "FOO":
