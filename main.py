@@ -147,13 +147,13 @@ class MarketBot(Protocol):
         #place new orders
         order_amt = 100
 
-        buy_order = {"type":"ADD", "order_id" = self.order_count, "symbol" = symbol, "dir" = "BUY", "price" = buy, "size" = order_amt}
+        buy_order = {"type":"ADD", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
         self.message(buy_order)
         self.open_orders.append(buy_order)
         self.order_count += 1
 
 
-        sell_order = {"type":"ADD", "order_id" = self.order_count, "symbol" = symbol, "dir" = "SELL", "price" = sell, "size" = order_amt}
+        sell_order = {"type":"ADD", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
         self.message(sell_order)
         self.open_orders.append(sell_order)
         self.order_count += 1
