@@ -45,6 +45,15 @@ class MarketBot(Protocol):
             'QUUX': 0,
             'CORGE': 0,
         }
+
+        self.spread = {
+            'FOO': [-99999999999,99999999999],
+            'BAR': [-99999999999,99999999999],
+            'BAZ': [-99999999999,99999999999],
+            'QUUX': [-99999999999,99999999999],
+            'CORGE': [-99999999999,99999999999],
+
+        }
         # not sure about the type for this yet
         self.order_history = []
         self.open_orders = []
@@ -191,6 +200,17 @@ class MarketBot(Protocol):
             sell -= 1
         else:
             return
+
+        if (self.spreads[symbol][0] > buy):
+            return 
+
+        if (self.spreads[symbol][1] < sell):
+            return 
+
+        self.spreads[symbol][0] = buy
+        self.spreads[symbol][1] = sell
+
+
 
         #place new orders
         order_amt = 1
