@@ -2,10 +2,12 @@
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet import reactor, protocol
 from twisted.python import log
+from twisted.internet.defer import setDebugging
 import json
 import pickle
 import csv
 
+setDebugging(True)
 # system imports
 import time, sys
 
@@ -81,7 +83,7 @@ class MarketBot(Protocol):
         # maybe do something here
         print("Connected.")
         # now do the hello handshake
-        self.message({"type": "hello", "team": "STRAWBERRY"})
+        self.message({"type": "hello", "team": "A"})
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
@@ -145,12 +147,12 @@ class MarketBot(Protocol):
     def on_order_filled(self, data):
         if self.flagged:
             self.flagged = False
-            print("ORDER FILLED : {0}".format(data['order_id']))
-            print self.cash
+            # print("ORDER FILLED : {0}".format(data['order_id']))
+            # print self.cash
             # for symbol, position in self.positions.items():
             #     print("SYM: {0} POS: {1}".format(symbol, position))
-            print(len(self.open_orders))
-            print(data)
+            # print(len(self.open_orders))
+            # print(data)
         for x in self.open_orders:
             if x["order_id"] == data["order_id"]:
                 self.open_orders.remove(x)
@@ -178,8 +180,8 @@ class MarketBot(Protocol):
         print("calling cancel all")
         print("\n"*10)
         for x in self.open_orders:
-            print("canceling order: {0}".format(x['order_id']))
-            print("total orders: {0}".format(len(self.open_orders))) 
+            #print("canceling order: {0}".format(x['order_id']))
+            #print("total orders: {0}".format(len(self.open_orders))) 
             cancel_msg = {"type": "cancel", "order_id": x["order_id"]}
             self.message(cancel_msg)
         self.open_orders = []
@@ -233,13 +235,13 @@ class MarketBot(Protocol):
         if self.positions[symbol] > 0:
             # we only want to buy as long as the overall is small
             if (self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
-                print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
+                # print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
                 return
         
         if self.positions[symbol] < 0:
             # we only want to buy as long as the overall is small
             if (-1 * self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
-                print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
+                # print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
                 return
 
         #place new orders
