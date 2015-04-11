@@ -52,7 +52,7 @@ class MarketBot(Protocol):
         self.market_open = False
         self.flagged = True
         self.last_cancel = time.time()
-        self.cancel_time = 1
+        self.cancel_time = 5
         self.canceling = False
         self.file = open('data.p', 'w')
         self.csv = csv.writer(self.file)
@@ -163,7 +163,11 @@ class MarketBot(Protocol):
         Make offers depending on the spread price of the book
         """
 
+        if len(self.open_orders) == 0:
+            self.canceling = False
+
         if self.canceling:
+            print("CANCELING")
             return
 
         if time.time() - self.last_cancel > self.cancel_time and not self.canceling:
@@ -172,9 +176,6 @@ class MarketBot(Protocol):
             self.cancel_all()
             self.last_cancel = time.time()
             return
-
-        if len(self.open_orders) == 0:
-            self.canceling = False
 
         symbol = data["symbol"]
         buy = data["buy"][0][0]
