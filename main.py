@@ -169,7 +169,7 @@ class MarketBot(Protocol):
             self.canceling = False
 
         if self.canceling:
-            print("CANCELING")
+            print("CANCELING - still")
             return
 
         if time.time() - self.last_cancel > self.cancel_time and not self.canceling:
