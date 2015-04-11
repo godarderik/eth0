@@ -204,18 +204,18 @@ class MarketBot(Protocol):
         }
 
 
-    def etf_artbitrage(self,data):
+    def etf_artbitrage(self):
 
         if self.corge_book != {} and self.foo_book != {} and self.bar_book != {}:
             print "here"
-            self.corge_buy_price = self.corge_book["buy"][0][0]
-            self.corge_sell_price = self.corge_book["sell"][0][0]
+            scorge_buy_price = self.corge_book["buy"][0][0]
+            corge_sell_price = self.corge_book["sell"][0][0]
 
-            self.foo_buy_price = self.foo_book["buy"][0][0]
-            self.foo_sell_price = self.foo_book["sell"][0][0]
+            foo_buy_price = self.foo_book["buy"][0][0]
+            foo_sell_price = self.foo_book["sell"][0][0]
 
-            self.foo_buy_price = self.foo_book["buy"][0][0]
-            self.foo_sell_price = self.foo_book["sell"][0][0]
+            foo_buy_price = self.foo_book["buy"][0][0]
+            foo_sell_price = self.foo_book["sell"][0][0]
 
             buy_etf_diff = .3 * foo_sell_price + .8 * bar_sell_price - corge_buy_price - 100
             sell_etf_diff = corge_sell_price - .3 * foo_sell_price - .8 * bar_sell_price - 100
