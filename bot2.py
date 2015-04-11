@@ -226,7 +226,7 @@ class MarketBot(Protocol):
                 print '2'
                 self.converts.append(self.order_count)
                 print '3'
-                convert_msg = {"type": "convert", "order_id": data["order_id"], "symbol": "CORGE", "dir": "BUY", "size": self.convert_amount}
+                convert_msg = {"type": "convert", "order_id":self.order_count, "symbol": "CORGE", "dir": "BUY", "size": self.convert_amount}
                 print '4'
                 self.message(convert_msg)
                 self.order_count += 1
