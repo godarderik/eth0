@@ -109,7 +109,7 @@ class MarketBot(Protocol):
         pass
 
     def on_rejection(self, data):
-        print("REJECTED!!")
+        print("REJECTED!! reason: {0}".format(data['reason']))
         print("\n" * 10)
         for x in self.open_orders:
             if x["order_id"] == data["order_id"]:
@@ -152,6 +152,8 @@ class MarketBot(Protocol):
         self.values[data['symbol']] = data['price']
 
     def cancel_all(self):
+        print("calling cancel all")
+        print("\n"*10)
         for x in self.open_orders:
             print("canceling order: {0}".format(x['order_id']))
             print("total orders: {0}".format(len(self.open_orders))) 
