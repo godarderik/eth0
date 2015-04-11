@@ -36,7 +36,7 @@ class MarketBot(Protocol):
             'QUUX': 0,
             'CORGE': 0,
         }
-        self.sigmas = 'FOO': 0,
+        self.sigmas = {'FOO': 0,
             'BAR': 0,
             'BAZ': 0,
             'QUUX': 0,
