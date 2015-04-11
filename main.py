@@ -19,7 +19,8 @@ SLOW_MARKET = 0
 FAST_MARKET = 1
 EMPTY_MARKET = 2
 
-ALPHA_FACTOR = 0.1
+ALPHA_FACTOR = 1.0
+ORDER_AMOUNT = 10
 
 class MarketBot(Protocol):
     def __init__(self):
@@ -221,7 +222,7 @@ class MarketBot(Protocol):
             buy += 1
             sell -= 1
         else:
-            print("not enough margin")
+            print("not enough margin: {0}".format(sell - buy))
             return
 
         # make sure we don't shoot ourselves
@@ -235,27 +236,26 @@ class MarketBot(Protocol):
 
         # should we buy at all? based on our position
 
-        if self.positions[symbol] > 0:
-            # we only want to buy as long as the overall is small
-            if (self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
-                # print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
-                print("position too high")
-                return
+        # if self.positions[symbol] > 0:
+        #     # we only want to buy as long as the overall is small
+        #     if (self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
+        #         # print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
+        #         print("position too high")
+        #         return
         
-        if self.positions[symbol] < 0:
-            # we only want to buy as long as the overall is small
-            if (-1 * self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
-                # print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
-                print("position too high")
-                return
+        # if self.positions[symbol] < 0:
+        #     # we only want to buy as long as the overall is small
+        #     if (-1 * self.positions[symbol] > ALPHA_FACTOR * (self.spread[symbol][1] - self.spread[symbol][0])):
+        #         # print("HIT MAX POSITION ON: {0}: {1}".format(symbol, self.positions[symbol]))
+        #         print("position too high")
+        #         return
 
         #place new orders
-        order_amt = 1
+        order_amt = ORDER_AMOUNT
 
         buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
         self.message(buy_order)
         self.order_count += 1
-
 
         sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
         self.message(sell_order)
