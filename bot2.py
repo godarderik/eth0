@@ -226,7 +226,7 @@ class MarketBot(Protocol):
                 self.message(convert_msg)
                 self.order_count += 1
                 self.convert_prices["foo"] = foo_sell_price
-                self.convert_prices["bar"] = foo_bar_price
+                self.convert_prices["bar"] = bar_sell_price
 
             #elif sell_etf_diff > 0: 
             #    #sell etf and convert
