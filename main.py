@@ -140,7 +140,7 @@ class MarketBot(Protocol):
         pass
 
     def cancel_all(self):
-        for x in open_orders: 
+        for x in self.open_orders: 
             cancel_msg = {"type": cancel, "order_id": x["order_id"]}
             self.message(cancel_msg)
             open_orders.remove(x)
