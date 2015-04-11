@@ -2,7 +2,6 @@
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet import reactor, protocol
 from twisted.python import log
-import pickle
 import json
 
 # system imports
@@ -50,16 +49,14 @@ class MarketBot(Protocol):
         self.order_count = 0
         self.market_open = False
         self.flagged = True
-
-        self.trades = []
-        self.start_time = time.time()
-        self.file = open('data.p', 'wb')
+        self.last_cancel = time.time()
+        self.cancel_time = 5
 
     def connectionMade(self):
         # maybe do something here
         print("Connected.")
         # now do the hello handshake
-        self.message({"type": "hello", "team": "STRAWBERRY_TEST"})
+        self.message({"type": "hello", "team": "STRAWBERRYRRB"})
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
@@ -104,37 +101,37 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        print "ack"
         pass
 
     def on_rejection(self, data):
-        print "reject"
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
                 break
     def on_order_filled(self, data):
 
-        print self.positions
         print self.cash
+        # for symbol, position in self.positions.items():
+        #     print("SYM: {0} POS: {1}".format(symbol, position))
         for x in open_orders:
-            if x["id"] == data["order_id"]:
+            if x["order_id"] == data["order_id"]:
                 open_orders.remove(x)
-                self.positions[x["symbol"]] += x["size"]
-                self.cash -= x["size"] * x["price"]
+                if x["dir"] == "SELL":
+                    self.positions[x["symbol"]] -= x["size"]
+                    self.cash += x["size"] * x["price"]
+                else: 
+                    self.positions[x["symbol"]] += x["size"]
+                    self.cash -= x["size"] * x["price"]
                 break
 
     def on_out(self, data):
-        print "out"
+        pass
 
     def on_public_trade(self, data):
         """
         Handle a public trade on the market
         """
-        self.trades.append((data['symbol'], data['price']))
-        if time.time() - self.start_time > 30:
-            pickle.dump(self.trades, self.file)
-            sys.exit(0)
+        pass
 
     def on_book_status(self, data):
         """
@@ -142,12 +139,14 @@ class MarketBot(Protocol):
         Make offers depending on the spread price of the book
         """
 
-    
+        if time.time() - self.last_cancel > self.cancel_time:
+            self.cancel_all()
+            self.last_cancel = time.time()
+
         symbol = data["symbol"]
         buy = data["buy"][0][0]
         sell = data["sell"][0][0]
 
-        print buy, sell
 
         if (sell - buy > 2):
             buy += 1
@@ -162,15 +161,15 @@ class MarketBot(Protocol):
 
 
         #place new orders
-        order_amt = 100
+        order_amt = 1
 
-        buy_order = {"type":"ADD", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
+        buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
         self.message(buy_order)
         self.open_orders.append(buy_order)
         self.order_count += 1
 
 
-        sell_order = {"type":"ADD", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
+        sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
         self.message(sell_order)
         self.open_orders.append(sell_order)
         self.order_count += 1
