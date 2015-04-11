@@ -36,7 +36,8 @@ class MarketBot(Protocol):
             'QUUX': 0,
             'CORGE': 0,
         }
-        self.sigmas = {'FOO': 0,
+        self.sigmas = {
+            'FOO': 0,
             'BAR': 0,
             'BAZ': 0,
             'QUUX': 0,
@@ -53,7 +54,7 @@ class MarketBot(Protocol):
         # maybe do something here
         print("Connected.")
         # now do the hello handshake
-        self.message(json.dumps({"type": "hello", "team": "STRAWBERRY"}))
+        self.message({"type": "hello", "team": "STRAWBERRY"})
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
