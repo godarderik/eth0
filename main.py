@@ -52,7 +52,7 @@ class MarketBot(Protocol):
         self.market_open = False
         self.flagged = True
         self.last_cancel = time.time()
-        self.cancel_time = 1
+        self.cancel_time = 5
         self.canceling = False
         self.file = open('data.p', 'w')
         self.csv = csv.writer(self.file)
@@ -109,7 +109,7 @@ class MarketBot(Protocol):
         self.open_orders.append(data)
 
     def on_rejection(self, data):
-        print("REJECTED!!")
+        print("REJECTED!! reason: {0}".format(data['reason']))
         print("\n" * 10)
         pass
 
@@ -150,6 +150,11 @@ class MarketBot(Protocol):
 
     def cancel_all(self):
         for x in self.open_orders: 
+        print("calling cancel all")
+        print("\n"*10)
+        for x in self.open_orders:
+            print("canceling order: {0}".format(x['order_id']))
+            print("total orders: {0}".format(len(self.open_orders))) 
             cancel_msg = {"type": "cancel", "order_id": x["order_id"]}
             self.message(cancel_msg)
             self.open_orders.remove(x)
@@ -160,18 +165,21 @@ class MarketBot(Protocol):
         Make offers depending on the spread price of the book
         """
 
-        if self.canceling:
-            return
-
-        if time.time() - self.last_cancel > self.cancel_time and not self.canceling:
-            print("CANCELING")
-            self.canceling = True   
-            self.cancel_all()
-            self.last_cancel = time.time()
-            return
+        print(len(self.open_orders))
 
         if len(self.open_orders) == 0:
             self.canceling = False
+
+        if self.canceling:
+            print("CANCELING - still")
+            return
+
+        if time.time() - self.last_cancel > self.cancel_time and not self.canceling:
+            self.canceling = True   
+            self.cancel_all()
+            self.last_cancel = time.time()
+            print("CANCELING")
+            return
 
         symbol = data["symbol"]
         buy = data["buy"][0][0]
@@ -181,14 +189,8 @@ class MarketBot(Protocol):
         if (sell - buy > 2):
             buy += 1
             sell -= 1
-
-
-        #cancel open orders
-        '''for x in open_orders[symbol]: 
-            cancel_order = {"type": "cancel", "order_id": x["id"]}
-            self.message(cancel_order)
-            open_orders.remove(x)'''
-
+        else:
+            return
 
         #place new orders
         order_amt = 1
@@ -206,8 +208,8 @@ class MarketBot(Protocol):
         overall = self.cash
         for symbol, position in self.positions.items():
             overall += self.values[symbol] * position 
-        print(overall)
-        self.csv.writerow([overall])
+        # print(overall)
+        # self.csv.writerow([overall])
         return overall
 
     def on_hello(self, data):

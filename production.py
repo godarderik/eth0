@@ -47,6 +47,7 @@ class MarketBot(Protocol):
             'QUUX': 0,
             'CORGE': 0,
         }
+        
         # not sure about the type for this yet
         self.order_history = []
         self.open_orders = []
