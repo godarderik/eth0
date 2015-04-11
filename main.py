@@ -99,9 +99,11 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
+        print "ack"
         pass
 
     def on_rejection(self, data):
+        print "reject"
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
@@ -118,7 +120,7 @@ class MarketBot(Protocol):
                 break
 
     def on_out(self, data):
-        pass
+        print "out"
 
     def on_public_trade(self, data):
         """
@@ -131,6 +133,8 @@ class MarketBot(Protocol):
         Handle more current information about the book
         Make offers depending on the spread price of the book
         """
+
+        print "book status"
     
         symbol = data["symbol"]
         buy = data["buy"][0][0]
