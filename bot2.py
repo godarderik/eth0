@@ -220,6 +220,7 @@ class MarketBot(Protocol):
 
             buy_amt = self.corge_book["buy"][0][1] - self.corge_book["buy"][0][1]%10
             buy_etf_diff = buy_amt * (.3 * foo_sell_price + .8 * bar_sell_price - corge_buy_price) - 100
+            print buy_amt, foo_sell_price, bar_sell_price, corge_buy_price
             #sell_etf_diff = corge_sell_price - .3 * foo_sell_price - .8 * bar_sell_price - 100
             print str(buy_etf_diff)
             if buy_etf_diff > 0: 
