@@ -52,7 +52,6 @@ class MarketBot(Protocol):
             'BAZ': [-99999999999,99999999999],
             'QUUX': [-99999999999,99999999999],
             'CORGE': [-99999999999,99999999999],
-
         }
         # not sure about the type for this yet
         self.order_history = []
@@ -65,6 +64,7 @@ class MarketBot(Protocol):
         self.canceling = False
         self.file = open('data.p', 'w')
         self.csv = csv.writer(self.file)
+        self.orders = {}
 
     def connectionMade(self):
         # maybe do something here
@@ -115,7 +115,13 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        self.open_orders.append(data)
+        order = self.orders[data['order_id']]
+        self.open_orders.append(order)
+        # update the spread
+        if order['dir'] == 'BUY':
+            self.spread[order['symbol']][0] = order['price']
+        elif order['dir'] == 'SELL':
+            self.spread[order['symbol']][1] = order['price']
 
     def on_rejection(self, data):
         print("REJECTED!! reason: {0}".format(data['reason']))
@@ -201,16 +207,11 @@ class MarketBot(Protocol):
         else:
             return
 
-        if (self.spreads[symbol][0] < buy):
+        if (self.spreads[symbol][0] > buy):
             return 
 
-        if (self.spreads[symbol][1] > sell):
+        if (self.spreads[symbol][1] < sell):
             return 
-
-        self.spreads[symbol][0] = buy
-        self.spreads[symbol][1] = sell
-
-
 
         #place new orders
         order_amt = 1
@@ -222,7 +223,10 @@ class MarketBot(Protocol):
 
         sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
         self.message(sell_order)
-        self.order_count += 1     
+        self.order_count += 1   
+
+        self.orders[buy_order['order_id']] = buy_order  
+        self.orders[sell_order['order_id']] = sell_order  
 
     def calculate_overall_position(self):
         overall = self.cash
