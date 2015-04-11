@@ -56,7 +56,7 @@ class MarketBot(Protocol):
         # maybe do something here
         print("Connected.")
         # now do the hello handshake
-        self.message({"type": "hello", "team": "STRAWBERRYRR"})
+        self.message({"type": "hello", "team": "STRAWBERRYRRR"})
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
