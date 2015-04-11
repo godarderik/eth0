@@ -16,9 +16,27 @@ FAST_MARKET = 1
 EMPTY_MARKET = 2
 
 class MarketBot(Protocol):
+    def __init__(self):
+        """
+        Set up the data for later
+        """
+        self.cash = 0
+        self.positions = {
+            'FOO': 0,
+            'BAR': 0,
+            'BAZ': 0,
+            'QUUX': 0,
+            'CORGE': 0,
+        }
+        # not sure about the type for this yet
+        self.order_history = []
+        self.market_open = False
+
     def connectionMade(self):
         # maybe do something here
         print("Connected.")
+        # now do the hello handshake
+        self.message({"type": "hello", "team": "strawberry"})
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
@@ -27,7 +45,21 @@ class MarketBot(Protocol):
         """
         Do something with the data
         """
-        print(data)
+        message_data = json.loads(data)
+        if message_data['type'] == 'hello':
+            self.onHello(message_data)
+
+    def onHello(self, data):
+        """
+        Handle the hello handshake response
+        """
+        self.cash = data['cash']
+        self.market_open = data['market_open']
+        for position in data['symbols']:
+            self.positions[position['symbol']] = position['position']
+        print("connected to exchange\nCash: {0}".format(self.cash))
+        for symbol, position in self.positions.items():
+            print("SYM: {0} POS: {1}".format(symbol, position))
 
     def message(self, message):
         self.transport.write(message + '\n')
