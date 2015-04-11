@@ -3,6 +3,8 @@ from twisted.internet.protocol import Protocol, Factory
 from twisted.internet import reactor, protocol
 from twisted.python import log
 import json
+import pickle
+import csv
 
 # system imports
 import time, sys
@@ -52,6 +54,8 @@ class MarketBot(Protocol):
         self.last_cancel = time.time()
         self.cancel_time = 1
         self.canceling = False
+        self.file = open('data.p', 'w')
+        self.csv = csv.writer(self.file)
 
     def connectionMade(self):
         # maybe do something here
@@ -161,7 +165,7 @@ class MarketBot(Protocol):
 
         if time.time() - self.last_cancel > self.cancel_time and not self.canceling:
             print("CANCELING")
-            self.canceling = True
+            self.canceling = True   
             self.cancel_all()
             self.last_cancel = time.time()
             return
@@ -205,6 +209,7 @@ class MarketBot(Protocol):
         for symbol, position in self.positions.items():
             overall += self.values[symbol] * position 
         print(overall)
+        self.csv.writerow([overall])
         return overall
 
     def on_hello(self, data):
