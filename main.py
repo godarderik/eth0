@@ -74,6 +74,8 @@ class MarketBot(Protocol):
         handle a single message
         """
 
+        print "hanle"
+
         # publicly exchanged information
         if data['type'] == 'trade':
             self.on_public_trade(data)
@@ -139,7 +141,7 @@ class MarketBot(Protocol):
         """
 
         print "book"
-        
+
         symbol = data["symbol"]
         buy = data["buy"][0][0]
         sell = data["sell"][0][0]
