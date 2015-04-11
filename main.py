@@ -112,7 +112,7 @@ class MarketBot(Protocol):
         for symbol, position in self.positions.items():
             print("SYM: {0} POS: {1}".format(symbol, position))
         for x in open_orders:
-            if x["id"] == data["order_id"]:
+            if x["order_id"] == data["order_id"]:
                 open_orders.remove(x)
                 if x["dir"] == "SELL":
                     self.positions[x["symbol"]] -= x["size"]
