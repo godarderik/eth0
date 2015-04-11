@@ -31,6 +31,7 @@ class MarketBot(Protocol):
         # not sure about the type for this yet
         self.order_history = []
         self.market_open = False
+        self.flagged = True
 
     def connectionMade(self):
         # maybe do something here
@@ -45,6 +46,11 @@ class MarketBot(Protocol):
         """
         Do something with the data
         """
+        if (self.flagged):
+            print(data)
+            print(dir(data))
+            self.flagged = False
+        return
         message_data = json.loads(data)
 
         # publicly exchanged information
@@ -73,7 +79,7 @@ class MarketBot(Protocol):
 
     def on_acknowledge(self, data):
         """
-
+        
         """
         pass
 
