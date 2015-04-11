@@ -99,7 +99,6 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        print "ack"
         pass
 
     def on_rejection(self, data):
@@ -145,10 +144,10 @@ class MarketBot(Protocol):
 
 
         #cancel open orders
-        '''for x in open_orders[symbol]: 
+        for x in open_orders[symbol]: 
             cancel_order = {"type": "cancel", "order_id": x["id"]}
             self.message(cancel_order)
-            open_orders.remove(x)'''
+            open_orders.remove(x)
 
 
         #place new orders
