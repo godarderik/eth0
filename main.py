@@ -117,8 +117,8 @@ class MarketBot(Protocol):
                     self.positions[x["symbol"]] -= x["size"]
                     self.cash += x["size"] * x["price"]
                 else: 
-                    self.positions[x["symbol"]] -= x["size"]
-                    self.cash += x["size"] * x["price"]
+                    self.positions[x["symbol"]] += x["size"]
+                    self.cash -= x["size"] * x["price"]
                 break
 
     def on_out(self, data):
