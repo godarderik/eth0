@@ -46,11 +46,12 @@ class MarketBot(Protocol):
         """
         Do something with the data
         """
-        # if (self.flagged):
-        #     print(data)
-        #     print(dir(data))
-        #     self.flagged = False
-        # return
+        if (self.flagged):
+            print(data)
+            print(type(data))
+            print(dir(data))
+            self.flagged = False
+        return
         
         # publicly exchanged information
         if data['type'] == 'trade':
