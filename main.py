@@ -28,8 +28,24 @@ class MarketBot(Protocol):
             'QUUX': 0,
             'CORGE': 0,
         }
+
+        self.values = {
+            'FOO': 0,
+            'BAR': 0,
+            'BAZ': 0,
+            'QUUX': 0,
+            'CORGE': 0,
+        }
+        self.sigmas = {'FOO': 0,
+            'BAR': 0,
+            'BAZ': 0,
+            'QUUX': 0,
+            'CORGE': 0,
+        }
         # not sure about the type for this yet
         self.order_history = []
+        self.open_orders = {}
+        self.order_count = 0
         self.market_open = False
         self.flagged = True
 
@@ -122,8 +138,28 @@ class MarketBot(Protocol):
     def on_book_status(self, data):
         """
         Handle more current information about the book
+        Make offers depending on the spread price of the book
         """
-        pass
+
+        symbol = data["symbol"]
+        buy = data["buy"][0][0]
+        sell = data["sell"][0][0]
+
+        if (sell - buy > 2):
+            buy += 1
+            sell -= 1
+
+
+        #cancel open orders
+        for x in open_orders[symbol]: 
+            self.message("CANCEL " + str(x) )
+
+        #place new orders
+        
+        order_amt = 100
+
+        self.message("ADD " + str(order_count) + symbol + "BUY " + str(buy) + str(order_amt))
+        self.message("ADD " + str(order_count) + symbol + "SELL " + str(sell) + str(order_amt))
 
     def on_hello(self, data):
         """
