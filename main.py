@@ -45,6 +45,8 @@ class MarketBot(Protocol):
         """
         Do something with the data
         """
+	print(data)
+	return 
         message_data = json.loads(data)
         if message_data['type'] == 'hello':
             self.onHello(message_data)
