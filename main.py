@@ -1,6 +1,6 @@
 # twisted imports
 from twisted.internet.protocol import Protocol, Factory
-from twisted.internet import reactor
+from twisted.internet import reactor, protocol
 from twisted.python import log
 import json
 
@@ -17,13 +17,17 @@ EMPTY_MARKET = 2
 
 class MarketBot(Protocol):
     def connectionMade(self):
-    	# maybe do something here
-    	print("Connected.")
+        # maybe do something here
+        print("Connected.")
 
     def connectionLost(self, reason):
-    	print("Disconnected for reason: {0}".format(reason))
+        print("Disconnected for reason: {0}".format(reason))
 
     def dataReceived(self, data):
+        """
+        Do something with the data
+        """
+        print(data)
 
     def message(self, message):
         self.transport.write(message + '\n')
@@ -35,9 +39,11 @@ class MarketBotFactory(protocol.ClientFactory):
     A new protocol instance will be created each time we connect to the server.
     """
 
-    def __init__(self, channel):
-        self.channel = channel
-        self.filename = filename
+    def __init__(self):
+        """
+        Do something clever here
+        """
+        pass
 
     def buildProtocol(self, addr):
         p = MarketBot()
@@ -57,7 +63,7 @@ if __name__ == '__main__':
     log.startLogging(sys.stdout)
     
     # create factory protocol and application
-    f = MarketBotFactory(sys.argv[1])
+    f = MarketBotFactory()
 
     # connect factory to this host and port
     reactor.connectTCP(TEST_PUBLIC_IP, JSON_PORT + SLOW_MARKET, f)
