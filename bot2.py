@@ -60,7 +60,7 @@ class MarketBot(Protocol):
         self.market_open = False
         self.flagged = True
         self.last_cancel = time.time()
-        self.cancel_time = 5
+        self.cancel_time = 0
         self.canceling = False
         self.file = open('data.p', 'w')
         self.csv = csv.writer(self.file)
