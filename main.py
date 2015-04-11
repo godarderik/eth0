@@ -54,7 +54,7 @@ class MarketBot(Protocol):
         # maybe do something here
         print("Connected.")
         # now do the hello handshake
-        self.message({"type": "hello", "team": "STRAWBERRYR"})
+        self.message({"type": "hello", "team": "STRAWBERRYRR"})
 
     def connectionLost(self, reason):
         print("Disconnected for reason: {0}".format(reason))
@@ -99,19 +99,18 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        print "ack"
+        pass
 
     def on_rejection(self, data):
-        print "rej"
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
                 break
     def on_order_filled(self, data):
-        print "filled"
 
-        #for symbol, position in self.positions.items():
-        #    print("SYM: {0} POS: {1}".format(symbol, position))
+        print self.cash
+        for symbol, position in self.positions.items():
+            print("SYM: {0} POS: {1}".format(symbol, position))
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
@@ -124,7 +123,6 @@ class MarketBot(Protocol):
                 break
 
     def on_out(self, data):
-        print "out"
 
     def on_public_trade(self, data):
         """
@@ -137,8 +135,6 @@ class MarketBot(Protocol):
         Handle more current information about the book
         Make offers depending on the spread price of the book
         """
-
-        print "book"
 
         symbol = data["symbol"]
         buy = data["buy"][0][0]
