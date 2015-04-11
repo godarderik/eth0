@@ -50,7 +50,7 @@ class MarketBot(Protocol):
         self.market_open = False
         self.flagged = True
         self.last_cancel = time.time()
-        self.cancel_time = 5
+        self.cancel_time = 1
         self.canceling = False
 
     def connectionMade(self):
