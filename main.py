@@ -134,7 +134,7 @@ class MarketBot(Protocol):
         Make offers depending on the spread price of the book
         """
 
-        print "book status"
+        print data
     
         symbol = data["symbol"]
         buy = data["buy"][0][0]
