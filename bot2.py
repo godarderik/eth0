@@ -234,6 +234,7 @@ class MarketBot(Protocol):
                 convert_msg = {"type": "convert", "order_id":self.order_count, "symbol": "CORGE", "dir": "BUY", "size": self.convert_amount}
             
                 self.message(convert_msg)
+                print "here 555"
                 self.order_count += 1
         
                 self.convert_prices["foo"] = foo_sell_price
