@@ -106,15 +106,12 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        pass
+        self.open_orders.append(data)
 
     def on_rejection(self, data):
         print("REJECTED!!")
         print("\n" * 10)
-        for x in self.open_orders:
-            if x["order_id"] == data["order_id"]:
-                self.open_orders.remove(x)
-                break
+        pass
 
     def on_order_filled(self, data):
         if self.flagged:
@@ -153,7 +150,7 @@ class MarketBot(Protocol):
 
     def cancel_all(self):
         for x in self.open_orders: 
-            cancel_msg = {"type": cancel, "order_id": x["order_id"]}
+            cancel_msg = {"type": "cancel", "order_id": x["order_id"]}
             self.message(cancel_msg)
             self.open_orders.remove(x)
 
@@ -198,13 +195,11 @@ class MarketBot(Protocol):
 
         buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
         self.message(buy_order)
-        self.open_orders.append(buy_order)
         self.order_count += 1
 
 
         sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
         self.message(sell_order)
-        self.open_orders.append(sell_order)
         self.order_count += 1     
 
     def calculate_overall_position(self):
