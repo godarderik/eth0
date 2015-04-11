@@ -99,7 +99,7 @@ class MarketBot(Protocol):
             self.on_error(data)
 
     def on_acknowledge(self, data):
-        pass
+        print "ack"
 
     def on_rejection(self, data):
         for x in open_orders:
@@ -108,8 +108,8 @@ class MarketBot(Protocol):
                 break
     def on_order_filled(self, data):
 
-        for symbol, position in self.positions.items():
-            print("SYM: {0} POS: {1}".format(symbol, position))
+        #for symbol, position in self.positions.items():
+        #    print("SYM: {0} POS: {1}".format(symbol, position))
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
