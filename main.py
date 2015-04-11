@@ -47,14 +47,21 @@ class MarketBot(Protocol):
         Do something with the data
         """
         if (self.flagged):
-            data = json.loads(data)
+            for datum in data.split('\n'):
+                a = json.loads(datum)
+                handle_single_message(a)
 
             print(data[:10])
             print(type(data))
             print(dir(data))
             self.flagged = False
         return
-        
+    
+    def handle_single_message(data):
+        """
+        handle a single message
+        """
+
         # publicly exchanged information
         if data['type'] == 'trade':
             self.on_public_trade(data)
