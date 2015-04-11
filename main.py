@@ -105,9 +105,9 @@ class MarketBot(Protocol):
         pass
 
     def on_rejection(self, data):
-        for x in open_orders:
+        for x in self.open_orders:
             if x["order_id"] == data["order_id"]:
-                open_orders.remove(x)
+                self.open_orders.remove(x)
                 break
     def on_order_filled(self, data):
         if self.flagged:
@@ -120,7 +120,7 @@ class MarketBot(Protocol):
             print(data)
         for x in self.open_orders:
             if x["order_id"] == data["order_id"]:
-                open_orders.remove(x)
+                self.open_orders.remove(x)
                 if x["dir"] == "SELL":
                     self.positions[x["symbol"]] -= x["size"]
                     self.cash += x["size"] * x["price"]
@@ -147,7 +147,7 @@ class MarketBot(Protocol):
         for x in self.open_orders: 
             cancel_msg = {"type": cancel, "order_id": x["order_id"]}
             self.message(cancel_msg)
-            open_orders.remove(x)
+            self.open_orders.remove(x)
 
     def on_book_status(self, data):
         """
