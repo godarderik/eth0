@@ -106,6 +106,9 @@ class MarketBot(Protocol):
                 open_orders.remove(x)
                 break
     def on_order_filled(self, data):
+
+        print self.positions
+        print self.cash
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
