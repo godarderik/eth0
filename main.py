@@ -65,7 +65,7 @@ class MarketBot(Protocol):
         if (self.flagged):
             print(data, '\n\n\n')
             try:
-                data = json.loads(data)
+                data = json.loads(data.strip())
             except:            
                 print(type(data))
                 print(dir(data))
