@@ -151,14 +151,14 @@ class MarketBot(Protocol):
 
 
         #cancel open orders
-        for x in open_orders[symbol]: 
+        '''for x in open_orders[symbol]: 
             cancel_order = {"type": "cancel", "order_id": x["id"]}
             self.message(cancel_order)
-            open_orders.remove(x)
+            open_orders.remove(x)'''
 
 
         #place new orders
-        order_amt = 10
+        order_amt = 1
 
         buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
         self.message(buy_order)
