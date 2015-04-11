@@ -218,7 +218,7 @@ class MarketBot(Protocol):
 
         print("PLACING ORDER")
         #place new orders
-        order_amt = 1
+        order_amt = 10
 
         buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
         self.message(buy_order)
