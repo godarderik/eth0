@@ -103,15 +103,14 @@ class MarketBot(Protocol):
         pass
 
     def on_rejection(self, data):
-        print "reject"
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
                 break
     def on_order_filled(self, data):
 
-        print self.positions
-        print self.cash
+        for symbol, position in self.positions.items():
+            print("SYM: {0} POS: {1}".format(symbol, position))
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
@@ -139,7 +138,6 @@ class MarketBot(Protocol):
         buy = data["buy"][0][0]
         sell = data["sell"][0][0]
 
-        print buy, sell
 
         if (sell - buy > 2):
             buy += 1
@@ -156,13 +154,13 @@ class MarketBot(Protocol):
         #place new orders
         order_amt = 100
 
-        buy_order = {"type":"ADD", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
+        buy_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "BUY", "price" : buy, "size" : order_amt}
         self.message(buy_order)
         self.open_orders.append(buy_order)
         self.order_count += 1
 
 
-        sell_order = {"type":"ADD", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
+        sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
         self.message(sell_order)
         self.open_orders.append(sell_order)
         self.order_count += 1
