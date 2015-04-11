@@ -36,7 +36,8 @@ class MarketBot(Protocol):
             'QUUX': 0,
             'CORGE': 0,
         }
-        self.sigmas = {'FOO': 0,
+        self.sigmas = {
+            'FOO': 0,
             'BAR': 0,
             'BAZ': 0,
             'QUUX': 0,
@@ -178,7 +179,7 @@ class MarketBot(Protocol):
         print(data)
 
     def message(self, message):
-        self.transport.write(message + '\n')
+        self.transport.write(json.dumps(message) + '\n')
 
 class MarketBotFactory(protocol.ClientFactory):
     """
