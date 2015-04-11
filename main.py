@@ -103,15 +103,14 @@ class MarketBot(Protocol):
         pass
 
     def on_rejection(self, data):
-        print "reject"
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
                 break
     def on_order_filled(self, data):
 
-        print self.positions
-        print self.cash
+       for symbol, position in self.positions.items():
+            print("SYM: {0} POS: {1}".format(symbol, position))
         for x in open_orders:
             if x["id"] == data["order_id"]:
                 open_orders.remove(x)
@@ -139,7 +138,6 @@ class MarketBot(Protocol):
         buy = data["buy"][0][0]
         sell = data["sell"][0][0]
 
-        print buy, sell
 
         if (sell - buy > 2):
             buy += 1
