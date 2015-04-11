@@ -159,7 +159,7 @@ class MarketBot(Protocol):
             print("total orders: {0}".format(len(self.open_orders))) 
             cancel_msg = {"type": "cancel", "order_id": x["order_id"]}
             self.message(cancel_msg)
-            self.open_orders.remove(x)
+        self.open_orders = []
 
     def on_book_status(self, data):
         """
