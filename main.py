@@ -130,8 +130,9 @@ class MarketBot(Protocol):
                     self.cash -= x["size"] * x["price"]
                     break
         print self.cash
-        for symbol, position in self.positions.items():
-            print("SYM: {0} POS: {1}".format(symbol, position))
+        self.calculate_overall_position()
+        # for symbol, position in self.positions.items():
+        #     print("SYM: {0} POS: {1}".format(symbol, position))
     
 
     def on_out(self, data):
@@ -141,7 +142,7 @@ class MarketBot(Protocol):
         """
         Handle a public trade on the market
         """
-        pass
+        self.values[data['symbol']] = data['price']
 
     def cancel_all(self):
         for x in self.open_orders: 
@@ -197,9 +198,14 @@ class MarketBot(Protocol):
         sell_order = {"type":"add", "order_id" : self.order_count, "symbol" : symbol, "dir" : "SELL", "price" : sell, "size" : order_amt}
         self.message(sell_order)
         self.open_orders.append(sell_order)
-        self.order_count += 1
+        self.order_count += 1     
 
-        
+    def calculate_overall_position(self):
+        overall = self.cash
+        for symbol, position in self.positions.items():
+            overall += self.values[symbol] * position 
+        print(overall)
+        return overall
 
     def on_hello(self, data):
         """
