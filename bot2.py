@@ -126,9 +126,9 @@ class MarketBot(Protocol):
         elif data['type'] == 'error':
             self.on_error(data)
 
-    def on_acknowledge(self, data):
-        print "here"
+    def on_acknowledge(self, data): 
         if (data['order_id'] in self.converts):
+            print "here"
 
             
             #sell off the reults of our converts
