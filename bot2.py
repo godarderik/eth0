@@ -13,6 +13,8 @@ import time, sys
 TEST_PUBLIC_IP = "52.1.34.5"
 TEST_PRIVATE_IP = "10.0.138.127"
 
+LOCAL_FORWARD_IP = "localhost"
+
 JSON_PORT = 25000
 SLOW_MARKET = 0
 FAST_MARKET = 1
@@ -237,8 +239,8 @@ class MarketBot(Protocol):
 
                 self.order_count += 1
         
-                self.convert_prices["foo"] = foo_sell_price-1
-                self.convert_prices["bar"] = bar_sell_price-1
+                self.convert_prices["foo"] = foo_buy_price-1
+                self.convert_prices["bar"] = bar_buy_price-1
 
 
 
@@ -378,8 +380,10 @@ if __name__ == '__main__':
     # create factory protocol and application
     f = MarketBotFactory()
 
+    reactor.connectTCP(LOCAL_FORWARD_IP, 8888, f)
+
     # connect factory to this host and port
-    reactor.connectTCP(TEST_PRIVATE_IP, JSON_PORT + SLOW_MARKET, f)
+    #reactor.connectTCP(TEST_PRIVATE_IP, JSON_PORT + SLOW_MARKET, f)
 
     # run bot
     reactor.run()

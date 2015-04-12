@@ -219,7 +219,7 @@ class MarketBot(Protocol):
 
     def on_book_status(self, data):
         """
-        Handle more current information about the book
+        Handle more current infor mation about the book
         Make offers depending on the spread price of the book
         """
 
